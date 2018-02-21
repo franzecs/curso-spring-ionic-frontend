@@ -1,9 +1,10 @@
 import { Component } from '@angular/core';
 import { IonicPage, NavController, NavParams } from 'ionic-angular';
 import { StorageService } from '../../services/storage.service';
-import { ClienteDTO } from '../../models/ClienteDTO';
+import { ClienteDTO } from '../../models/cliente.dto';
 import { ClienteService } from '../../services/domain/cliente.service';
 import { API_CONFIG } from '../../config/api.config';
+
 
 @IonicPage()
 @Component({
@@ -12,7 +13,8 @@ import { API_CONFIG } from '../../config/api.config';
 })
 export class ProfilePage {
 
-  cliente:ClienteDTO;
+  cliente: ClienteDTO;
+  picture: string;
 
   constructor(
     public navCtrl: NavController, 
@@ -22,22 +24,26 @@ export class ProfilePage {
   }
 
   ionViewDidLoad() {
+    this.loadData();
+  }
+
+  loadData() {
     let localUser = this.storage.getLocalUser();
-    if(localUser && localUser.email){
+    if (localUser && localUser.email) {
       this.clienteService.findByEmail(localUser.email)
         .subscribe(response => {
-          this.cliente = response;
+          this.cliente = response as ClienteDTO;
           this.getImageIfExists();
         },
-        error =>{
-          if(error.status == 403){
+        error => {
+          if (error.status == 403) {
             this.navCtrl.setRoot('HomePage');
           }
         });
     }
-    else{
+    else {
       this.navCtrl.setRoot('HomePage');
-    }
+    }    
   }
 
   getImageIfExists() {
